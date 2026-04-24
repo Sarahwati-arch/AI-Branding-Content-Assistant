@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { ChevronRight, Home } from "lucide-react";
 import Link from "next/link";
+import { useBreadcrumb } from "./breadcrumb-provider";
 
 const labelMap: Record<string, string> = {
   dashboard: "Dashboard",
@@ -17,6 +18,7 @@ const labelMap: Record<string, string> = {
 
 export function Breadcrumb() {
   const pathname = usePathname();
+  const { overrides } = useBreadcrumb();
   const segments = pathname.split("/").filter(Boolean);
 
   if (segments.length === 0) return null;
@@ -32,7 +34,7 @@ export function Breadcrumb() {
       {segments.map((segment, index) => {
         const href = "/" + segments.slice(0, index + 1).join("/");
         const isLast = index === segments.length - 1;
-        const label = labelMap[segment] || segment;
+        const label = overrides[segment] || labelMap[segment] || segment;
 
         return (
           <span key={href} className="flex items-center gap-1">
