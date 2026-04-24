@@ -1,7 +1,7 @@
 export function Skeleton({ className = "" }: { className?: string }) {
   return (
     <div
-      className={`animate-pulse rounded-lg bg-secondary ${className}`}
+      className={`rounded-lg bg-gradient-to-r from-transparent via-secondary to-transparent bg-[length:200%_100%] animate-shimmer ${className}`}
     />
   );
 }

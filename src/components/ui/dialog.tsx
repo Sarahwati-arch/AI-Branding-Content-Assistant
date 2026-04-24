@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface DialogProps {
   open: boolean;
@@ -11,14 +11,25 @@ interface DialogProps {
 
 export function Dialog({ open, onClose, children, title }: DialogProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  const [animateIn, setAnimateIn] = useState(false);
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     if (open) {
+      setVisible(true);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setAnimateIn(true));
+      });
       document.addEventListener("keydown", handleEsc);
       document.body.style.overflow = "hidden";
+    } else {
+      setAnimateIn(false);
+      const timer = setTimeout(() => setVisible(false), 200);
+      document.body.style.overflow = "";
+      return () => clearTimeout(timer);
     }
     return () => {
       document.removeEventListener("keydown", handleEsc);
@@ -26,7 +37,7 @@ export function Dialog({ open, onClose, children, title }: DialogProps) {
     };
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!visible) return null;
 
   return (
     <div
@@ -36,11 +47,23 @@ export function Dialog({ open, onClose, children, title }: DialogProps) {
         if (e.target === overlayRef.current) onClose();
       }}
     >
-      <div className="fixed inset-0 bg-black/50" />
-      <div className="relative bg-card rounded-xl border border-border shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <div
+        className={`fixed inset-0 bg-overlay transition-opacity duration-200 ${
+          animateIn ? "opacity-100" : "opacity-0"
+        }`}
+      />
+      <div
+        className={`relative bg-card rounded-xl border border-border shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto transition-all duration-200 ${
+          animateIn
+            ? "opacity-100 scale-100"
+            : "opacity-0 scale-[0.95]"
+        }`}
+      >
         {title && (
           <div className="p-6 pb-0">
-            <h2 className="text-lg font-semibold text-card-foreground">{title}</h2>
+            <h2 className="text-lg font-semibold text-card-foreground">
+              {title}
+            </h2>
           </div>
         )}
         <div className="p-6">{children}</div>
