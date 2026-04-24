@@ -14,7 +14,7 @@ export async function GET() {
 
     const { data: brands, error } = await supabase
       .from("brands")
-      .select("*, brand_guidelines(*)")
+      .select("*")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
@@ -22,7 +22,29 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ data: brands });
+    // Fetch all guidelines for user's brands separately
+    const brandIds = (brands ?? []).map((b: { id: string }) => b.id);
+    let guidelinesMap: Record<string, unknown[]> = {};
+
+    if (brandIds.length > 0) {
+      const { data: allGuidelines } = await supabase
+        .from("brand_guidelines")
+        .select("*")
+        .in("brand_id", brandIds);
+
+      for (const g of allGuidelines ?? []) {
+        const bid = (g as { brand_id: string }).brand_id;
+        if (!guidelinesMap[bid]) guidelinesMap[bid] = [];
+        guidelinesMap[bid].push(g);
+      }
+    }
+
+    const brandsWithGuidelines = (brands ?? []).map((b: { id: string }) => ({
+      ...b,
+      brand_guidelines: guidelinesMap[b.id] ?? [],
+    }));
+
+    return NextResponse.json({ data: brandsWithGuidelines });
   } catch (error) {
     console.error("Get brands error:", error);
     return NextResponse.json(
@@ -44,7 +66,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { brand_name, industry, description, target_audience, unique_value, logo_url } = body;
+    const { brand_name, industry, description, target_audience, unique_value, logo_url, brand_guidelines } = body;
 
     const { data: brand, error } = await supabase
       .from("brands")
@@ -62,6 +84,22 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    if (brand_guidelines) {
+      const { error: guidelinesError } = await supabase
+        .from("brand_guidelines")
+        .insert({
+          brand_id: brand.id,
+          ...brand_guidelines,
+        });
+
+      if (guidelinesError) {
+        return NextResponse.json(
+          { error: "Brand tersimpan tapi gagal menyimpan guidelines: " + guidelinesError.message },
+          { status: 500 }
+        );
+      }
     }
 
     return NextResponse.json({ data: brand }, { status: 201 });

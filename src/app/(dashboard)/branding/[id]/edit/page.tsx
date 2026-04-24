@@ -7,11 +7,13 @@ import { BrandProfileForm } from "@/components/branding/brand-profile-form";
 import { BrandKitDisplay } from "@/components/branding/brand-kit-display";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft } from "lucide-react";
+import { useBreadcrumb } from "@/components/layout/breadcrumb-provider";
 import type { BrandKitOutput } from "@/lib/openai/schemas/branding";
 
 export default function EditBrandPage() {
   const params = useParams();
   const router = useRouter();
+  const { setOverride } = useBreadcrumb();
   const [loading, setLoading] = useState(true);
   const [step, setStep] = useState<"form" | "preview">("form");
   const [brandData, setBrandData] = useState<{
@@ -35,7 +37,7 @@ export default function EditBrandPage() {
 
   const fetchBrand = async () => {
     try {
-      const res = await fetch(`/api/brands/${params.id}`);
+      const res = await fetch(`/api/brands/${params.id}`, { cache: "no-store" });
       const data = await res.json();
       if (res.ok) {
         const brand = data.data;
@@ -48,6 +50,9 @@ export default function EditBrandPage() {
           visualStyle: "",
         });
         setLogoUrl(brand.logo_url);
+        if (brand.brand_name) {
+          setOverride(params.id as string, brand.brand_name);
+        }
       }
     } catch (error) {
       console.error("Error fetching brand:", error);
@@ -117,8 +122,7 @@ export default function EditBrandPage() {
     setSaving(true);
 
     try {
-      // Update brand profile
-      const brandRes = await fetch(`/api/brands/${params.id}`, {
+      const res = await fetch(`/api/brands/${params.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -128,34 +132,20 @@ export default function EditBrandPage() {
           target_audience: brandData.targetAudience,
           unique_value: brandData.uniqueValue,
           logo_url: logoUrl,
+          brand_guidelines: brandKit,
         }),
       });
 
-      if (!brandRes.ok) {
-        const brandResult = await brandRes.json();
-        setError(brandResult.error || "Gagal mengupdate brand");
+      const result = await res.json();
+
+      if (!res.ok) {
+        setError(result.error || "Gagal mengupdate brand");
         setSaving(false);
         return;
       }
 
-      // Upsert brand guidelines
-      const { createClient } = await import("@/lib/supabase/client");
-      const supabase = createClient();
-      const { error: guidelinesError } = await supabase
-        .from("brand_guidelines")
-        .upsert({
-          brand_id: params.id as string,
-          ...brandKit,
-        }, { onConflict: "brand_id" });
-
-      if (guidelinesError) {
-        setError("Brand tersimpan tapi gagal menyimpan guidelines");
-        setSaving(false);
-        return;
-      }
-
-      router.push(`/branding/${params.id}`);
-      router.refresh();
+      // Full page reload to ensure fresh data
+      window.location.href = `/branding/${params.id}`;
     } catch {
       setError("Terjadi kesalahan saat menyimpan");
     } finally {

@@ -85,7 +85,7 @@ export default function NewBrandPage() {
     setSaving(true);
 
     try {
-      // Create brand
+      // Create brand with guidelines
       const brandRes = await fetch("/api/brands", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -96,6 +96,7 @@ export default function NewBrandPage() {
           target_audience: brandData.targetAudience,
           unique_value: brandData.uniqueValue,
           logo_url: logoUrl,
+          brand_guidelines: brandKit,
         }),
       });
 
@@ -106,24 +107,7 @@ export default function NewBrandPage() {
         return;
       }
 
-      // Save brand guidelines
-      const { createClient } = await import("@/lib/supabase/client");
-      const supabase = createClient();
-      const { error: guidelinesError } = await supabase
-        .from("brand_guidelines")
-        .insert({
-          brand_id: brandResult.data.id,
-          ...brandKit,
-        });
-
-      if (guidelinesError) {
-        setError("Brand tersimpan tapi gagal menyimpan guidelines");
-        setSaving(false);
-        return;
-      }
-
       router.push("/branding");
-      router.refresh();
     } catch {
       setError("Terjadi kesalahan saat menyimpan");
     } finally {
