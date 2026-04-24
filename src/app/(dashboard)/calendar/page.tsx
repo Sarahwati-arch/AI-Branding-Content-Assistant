@@ -47,6 +47,7 @@ export default function CalendarPage() {
     description: string;
     platform: string;
     scheduled_at: string;
+    content_id?: string | null;
   }) => {
     setScheduling(true);
     try {
