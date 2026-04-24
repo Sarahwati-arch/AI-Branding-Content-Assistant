@@ -1,6 +1,7 @@
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
 import { ToastProvider } from "@/components/ui/toast";
+import { ThemeInitializer } from "@/components/ui/theme-initializer";
 
 export default function DashboardLayout({
   children,
@@ -9,7 +10,8 @@ export default function DashboardLayout({
 }) {
   return (
     <ToastProvider>
-      <div className="flex h-screen overflow-hidden">
+      <ThemeInitializer />
+      <div className="flex h-screen overflow-hidden bg-dot-pattern">
         <Sidebar />
         <div className="flex-1 flex flex-col overflow-hidden">
           <Header />
