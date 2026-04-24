@@ -9,6 +9,22 @@ interface PlatformBreakdownProps {
 }
 
 export function PlatformBreakdown({ analytics }: PlatformBreakdownProps) {
+  const getThemeColors = () => {
+    if (typeof window === "undefined") {
+      return {
+        tooltipBg: "#ffffff",
+        tooltipBorder: "#e2e8f0",
+      };
+    }
+    const style = getComputedStyle(document.documentElement);
+    return {
+      tooltipBg: style.getPropertyValue("--card").trim() || "#ffffff",
+      tooltipBorder: style.getPropertyValue("--border").trim() || "#e2e8f0",
+    };
+  };
+
+  const colors = getThemeColors();
+
   const platformData = analytics.reduce(
     (acc, a) => {
       const p = a.platform as Platform;
@@ -31,7 +47,7 @@ export function PlatformBreakdown({ analytics }: PlatformBreakdownProps) {
 
   if (platformData.length === 0) {
     return (
-      <div className="p-6 rounded-xl border border-border bg-card">
+      <div className="p-5 rounded-xl border border-border bg-card">
         <h3 className="text-lg font-semibold text-foreground mb-4">Per Platform</h3>
         <div className="h-64 flex items-center justify-center text-muted-foreground">
           Belum ada data platform
@@ -41,7 +57,7 @@ export function PlatformBreakdown({ analytics }: PlatformBreakdownProps) {
   }
 
   return (
-    <div className="p-6 rounded-xl border border-border bg-card">
+    <div className="p-5 rounded-xl border border-border bg-card">
       <h3 className="text-lg font-semibold text-foreground mb-4">Per Platform</h3>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
@@ -64,8 +80,8 @@ export function PlatformBreakdown({ analytics }: PlatformBreakdownProps) {
             </Pie>
             <Tooltip
               contentStyle={{
-                background: "white",
-                border: "1px solid #e2e8f0",
+                background: colors.tooltipBg,
+                border: `1px solid ${colors.tooltipBorder}`,
                 borderRadius: "8px",
               }}
               formatter={(value, name) => [

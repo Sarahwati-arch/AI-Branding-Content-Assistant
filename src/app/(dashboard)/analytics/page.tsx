@@ -125,7 +125,7 @@ export default function AnalyticsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Analitik</h1>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Analitik</h1>
           <p className="text-muted-foreground mt-1">Pantau performa konten Anda</p>
         </div>
         <Button onClick={() => setAddModalOpen(true)}>
@@ -137,16 +137,16 @@ export default function AnalyticsPage() {
       {loading ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="h-20 rounded-xl bg-secondary animate-pulse" />
+            <div key={i} className="h-20 rounded-xl bg-gradient-to-r from-transparent via-secondary to-transparent bg-[length:200%_100%] animate-shimmer" />
           ))}
         </div>
       ) : analytics.length === 0 ? (
-        <div className="text-center py-16">
-          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+        <div className="text-center py-16 border-2 border-dashed border-border rounded-xl bg-secondary/30">
+          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4 animate-float">
             <BarChart3 size={32} className="text-primary" />
           </div>
           <h2 className="text-lg font-semibold text-foreground">Belum ada data analitik</h2>
-          <p className="text-muted-foreground mt-2 mb-6">
+          <p className="text-muted-foreground mt-2 mb-6 max-w-md mx-auto">
             Tambahkan data performa konten untuk melihat insight
           </p>
           <Button onClick={() => setAddModalOpen(true)}>

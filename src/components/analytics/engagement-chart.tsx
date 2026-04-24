@@ -17,6 +17,33 @@ interface EngagementChartProps {
 }
 
 export function EngagementChart({ analytics }: EngagementChartProps) {
+  // Get theme-aware colors
+  const getThemeColors = () => {
+    if (typeof window === "undefined") {
+      return {
+        primary: "#6366f1",
+        accent: "#f59e0b",
+        success: "#10b981",
+        grid: "#e2e8f0",
+        text: "#64748b",
+        tooltipBg: "#ffffff",
+        tooltipBorder: "#e2e8f0",
+      };
+    }
+    const style = getComputedStyle(document.documentElement);
+    return {
+      primary: style.getPropertyValue("--primary").trim() || "#6366f1",
+      accent: style.getPropertyValue("--accent").trim() || "#f59e0b",
+      success: style.getPropertyValue("--success").trim() || "#10b981",
+      grid: style.getPropertyValue("--border").trim() || "#e2e8f0",
+      text: style.getPropertyValue("--muted-foreground").trim() || "#64748b",
+      tooltipBg: style.getPropertyValue("--card").trim() || "#ffffff",
+      tooltipBorder: style.getPropertyValue("--border").trim() || "#e2e8f0",
+    };
+  };
+
+  const colors = getThemeColors();
+
   // Group by date
   const chartData = analytics.reduce(
     (acc, a) => {
@@ -39,7 +66,7 @@ export function EngagementChart({ analytics }: EngagementChartProps) {
 
   if (chartData.length === 0) {
     return (
-      <div className="p-6 rounded-xl border border-border bg-card">
+      <div className="p-5 rounded-xl border border-border bg-card">
         <h3 className="text-lg font-semibold text-foreground mb-4">Engagement</h3>
         <div className="h-64 flex items-center justify-center text-muted-foreground">
           Belum ada data engagement
@@ -49,25 +76,25 @@ export function EngagementChart({ analytics }: EngagementChartProps) {
   }
 
   return (
-    <div className="p-6 rounded-xl border border-border bg-card">
+    <div className="p-5 rounded-xl border border-border bg-card">
       <h3 className="text-lg font-semibold text-foreground mb-4">Engagement</h3>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-            <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke="#64748b" />
-            <YAxis tick={{ fontSize: 12 }} stroke="#64748b" />
+            <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
+            <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke={colors.text} />
+            <YAxis tick={{ fontSize: 12 }} stroke={colors.text} />
             <Tooltip
               contentStyle={{
-                background: "white",
-                border: "1px solid #e2e8f0",
+                background: colors.tooltipBg,
+                border: `1px solid ${colors.tooltipBorder}`,
                 borderRadius: "8px",
               }}
             />
             <Legend />
-            <Bar dataKey="likes" fill="#6366f1" name="Likes" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="comments" fill="#f59e0b" name="Komentar" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="shares" fill="#10b981" name="Share" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="likes" fill={colors.primary} name="Likes" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="comments" fill={colors.accent} name="Komentar" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="shares" fill={colors.success} name="Share" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

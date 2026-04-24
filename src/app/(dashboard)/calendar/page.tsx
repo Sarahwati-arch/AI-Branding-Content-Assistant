@@ -82,7 +82,7 @@ export default function CalendarPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Kalender Konten</h1>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Kalender Konten</h1>
           <p className="text-muted-foreground mt-1">Jadwalkan dan kelola posting konten Anda</p>
         </div>
         <Button onClick={() => { setSelectedDate(new Date()); setModalOpen(true); }}>
