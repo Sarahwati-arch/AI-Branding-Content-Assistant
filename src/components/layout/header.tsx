@@ -1,15 +1,16 @@
 "use client";
 
-import { User } from "lucide-react";
+import { Breadcrumb } from "@/components/layout/breadcrumb";
+import { UserMenu } from "@/components/layout/user-menu";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export function Header() {
   return (
-    <header className="h-16 border-b border-border bg-card flex items-center justify-between px-6">
-      <div className="lg:hidden w-10" />
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-          <User size={16} className="text-primary" />
-        </div>
+    <header className="h-16 border-b border-border bg-card/80 backdrop-blur-md flex items-center justify-between px-6 sticky top-0 z-30">
+      <Breadcrumb />
+      <div className="flex items-center gap-2">
+        <ThemeToggle />
+        <UserMenu />
       </div>
     </header>
   );
