@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Edit2, Trash2 } from "lucide-react";
+import { useBreadcrumb } from "@/components/layout/breadcrumb-provider";
 import type { BrandProfile, BrandGuidelines } from "@/types";
 
 type BrandWithGuidelines = BrandProfile & { brand_guidelines: BrandGuidelines[] };
@@ -15,8 +16,11 @@ type BrandWithGuidelines = BrandProfile & { brand_guidelines: BrandGuidelines[] 
 export default function BrandDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { setOverride } = useBreadcrumb();
   const [brand, setBrand] = useState<BrandWithGuidelines | null>(null);
   const [loading, setLoading] = useState(true);
+  const [generatingLogo, setGeneratingLogo] = useState(false);
+  const [logoError, setLogoError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchBrand();
@@ -24,15 +28,64 @@ export default function BrandDetailPage() {
 
   const fetchBrand = async () => {
     try {
-      const res = await fetch(`/api/brands/${params.id}`);
+      const res = await fetch(`/api/brands/${params.id}`, { cache: "no-store" });
       const data = await res.json();
       if (res.ok) {
         setBrand(data.data);
+        if (data.data?.brand_name) {
+          setOverride(params.id as string, data.data.brand_name);
+        }
       }
     } catch (error) {
       console.error("Error fetching brand:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGenerateLogo = async () => {
+    if (!brand) return;
+    setGeneratingLogo(true);
+    setLogoError(null);
+    try {
+      const res = await fetch("/api/ai/generate-logo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          brandName: brand.brand_name,
+          industry: brand.industry,
+          description: brand.description,
+          brandGuidelines: brand.brand_guidelines?.[0]
+            ? {
+                primary_color: brand.brand_guidelines[0].primary_color,
+                visual_style: brand.brand_guidelines[0].visual_style,
+              }
+            : undefined,
+        }),
+      });
+      const result = await res.json();
+      if (!res.ok) {
+        setLogoError(result.error || "Gagal generate logo");
+        return;
+      }
+      if (!result.url) {
+        setLogoError("Logo URL tidak ditemukan");
+        return;
+      }
+      const updateRes = await fetch(`/api/brands/${params.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ logo_url: result.url }),
+      });
+      if (!updateRes.ok) {
+        setLogoError("Logo tergenerate tapi gagal disimpan ke database");
+        return;
+      }
+      setBrand((prev) => (prev ? { ...prev, logo_url: result.url } : prev));
+    } catch {
+      setLogoError("Terjadi kesalahan koneksi");
+    } finally {
+      setGeneratingLogo(false);
     }
   };
 
@@ -105,7 +158,19 @@ export default function BrandDetailPage() {
       </div>
 
       {guidelines ? (
-        <BrandKitDisplay kit={guidelines} logoUrl={brand.logo_url} />
+        <>
+          {logoError && (
+            <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
+              {logoError}
+            </div>
+          )}
+          <BrandKitDisplay
+            kit={guidelines}
+            logoUrl={brand.logo_url}
+            onGenerateLogo={handleGenerateLogo}
+            generatingLogo={generatingLogo}
+          />
+        </>
       ) : (
         <div className="text-center py-16 p-6 rounded-xl border border-border bg-card">
           <p className="text-muted-foreground mb-4">

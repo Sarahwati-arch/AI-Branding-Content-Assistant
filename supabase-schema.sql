@@ -233,3 +233,30 @@ CREATE TRIGGER update_contents_updated_at BEFORE UPDATE ON contents
 
 CREATE TRIGGER update_calendar_events_updated_at BEFORE UPDATE ON calendar_events
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ============================================
+-- 7. STORAGE BUCKET & POLICIES (for logos)
+-- ============================================
+-- Insert the 'logos' bucket (run only if not created via dashboard)
+INSERT INTO storage.buckets (id, name, public) VALUES ('logos', 'logos', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Allow authenticated users to upload logos to their own folder
+CREATE POLICY "Authenticated users can upload logos" ON storage.objects
+  FOR INSERT WITH CHECK (
+    bucket_id = 'logos' AND
+    auth.role() = 'authenticated' AND
+    (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+-- Allow authenticated users to update their own logos
+CREATE POLICY "Authenticated users can update own logos" ON storage.objects
+  FOR UPDATE USING (
+    bucket_id = 'logos' AND
+    auth.role() = 'authenticated' AND
+    (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+-- Allow public read access to logos (since bucket is public)
+CREATE POLICY "Public read access for logos" ON storage.objects
+  FOR SELECT USING (bucket_id = 'logos');

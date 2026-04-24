@@ -19,6 +19,8 @@ export default function BrandingPage() {
     fetchBrands();
   }, []);
 
+  const [imgErrors, setImgErrors] = useState<Set<string>>(new Set());
+
   const fetchBrands = async () => {
     try {
       const res = await fetch("/api/brands");
@@ -91,11 +93,14 @@ export default function BrandingPage() {
                 className="block p-5 rounded-xl border border-border bg-card hover:-translate-y-1 hover:shadow-lg hover:border-primary/30 transition-all duration-200 border-t-2 border-t-primary"
               >
                 <div className="flex items-start gap-4">
-                  {brand.logo_url ? (
+                  {brand.logo_url && !imgErrors.has(brand.id) ? (
                     <img
                       src={brand.logo_url}
                       alt={brand.brand_name}
                       className="w-12 h-12 rounded-lg object-cover"
+                      onError={() =>
+                        setImgErrors((prev) => new Set(prev).add(brand.id))
+                      }
                     />
                   ) : (
                     <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">

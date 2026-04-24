@@ -24,17 +24,41 @@ export async function POST(request: NextRequest) {
       n: 1,
       size: "1024x1024",
       quality: "standard",
+      response_format: "b64_json",
     });
 
-    const imageUrl = response.data?.[0]?.url;
-    if (!imageUrl) {
+    const b64 = response.data?.[0]?.b64_json;
+    if (!b64) {
       return NextResponse.json(
         { error: "Gagal generate logo" },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({ url: imageUrl });
+    // Convert base64 to Uint8Array for Supabase Storage upload
+    const buffer = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+    const fileName = `${user.id}/${Date.now()}-logo.png`;
+
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("logos")
+      .upload(fileName, buffer, {
+        contentType: "image/png",
+        upsert: true,
+      });
+
+    if (uploadError || !uploadData) {
+      console.error("Storage upload error:", uploadError);
+      return NextResponse.json(
+        { error: "Gagal menyimpan logo" },
+        { status: 500 }
+      );
+    }
+
+    const { data: urlData } = supabase.storage
+      .from("logos")
+      .getPublicUrl(fileName);
+
+    return NextResponse.json({ url: urlData.publicUrl });
   } catch (error) {
     console.error("Generate logo error:", error);
     return NextResponse.json(
