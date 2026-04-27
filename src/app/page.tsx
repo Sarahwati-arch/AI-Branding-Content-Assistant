@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   Palette,
@@ -12,81 +14,78 @@ import {
   Globe,
 } from "lucide-react";
 import { AnimateIn } from "@/components/ui/animate-in";
-
-const features = [
-  {
-    icon: Palette,
-    title: "Brand Kit Generator",
-    description:
-      "AI buatkan palet warna, tipografi, tagline, dan tone of voice yang sesuai dengan brand Anda.",
-    accent: "border-t-primary",
-  },
-  {
-    icon: FileText,
-    title: "Content Generator",
-    description:
-      "Generate caption, hashtag, dan ide konten untuk Instagram, TikTok, Facebook, dan platform lainnya.",
-    accent: "border-t-success",
-  },
-  {
-    icon: CalendarDays,
-    title: "Kalender Konten",
-    description:
-      "Jadwalkan posting konten dengan kalender visual yang mudah digunakan.",
-    accent: "border-t-accent",
-  },
-  {
-    icon: BarChart3,
-    title: "Analitik & Insight",
-    description:
-      "Pantau performa konten dan dapatkan rekomendasi AI untuk meningkatkan engagement.",
-    accent: "border-t-destructive",
-  },
-  {
-    icon: Sparkles,
-    title: "Logo Generator",
-    description:
-      "Generate logo brand dengan DALL-E AI dalam hitungan detik.",
-    accent: "border-t-primary",
-  },
-  {
-    icon: CheckCircle2,
-    title: "Visual Assets",
-    description:
-      "Buat visual konten yang sesuai ukuran tiap platform media sosial.",
-    accent: "border-t-success",
-  },
-];
-
-const socialProofs = [
-  { value: "1,000+", label: "Brand Dibuat" },
-  { value: "5,000+", label: "Konten Generate" },
-  { value: "100+", label: "Pengguna Aktif" },
-  { value: "4.9/5", label: "Rating Pengguna" },
-];
-
-const steps = [
-  {
-    num: "1",
-    title: "Buat Brand Profile",
-    description:
-      "Isi informasi brand Anda dan AI akan generate brand kit lengkap",
-  },
-  {
-    num: "2",
-    title: "Generate Konten",
-    description:
-      "AI buatkan caption, hashtag, dan visual untuk tiap platform",
-  },
-  {
-    num: "3",
-    title: "Jadwalkan & Analisis",
-    description:
-      "Atur jadwal posting dan pantau performa dengan insight AI",
-  },
-];
+import { AwogawogButton } from "@/components/awogawog-button";
+import { LanguageSwitcher } from "@/components/ui/language-switcher";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { useTranslations } from "next-intl";
 
 export default function Home() {
+  const t = useTranslations();
+
+  const features = [
+    {
+      icon: Palette,
+      title: t("landing.featBrandKitTitle"),
+      description: t("landing.featBrandKitDesc"),
+      accent: "border-t-primary",
+    },
+    {
+      icon: FileText,
+      title: t("landing.featContentTitle"),
+      description: t("landing.featContentDesc"),
+      accent: "border-t-success",
+    },
+    {
+      icon: CalendarDays,
+      title: t("landing.featCalendarTitle"),
+      description: t("landing.featCalendarDesc"),
+      accent: "border-t-accent",
+    },
+    {
+      icon: BarChart3,
+      title: t("landing.featAnalyticsTitle"),
+      description: t("landing.featAnalyticsDesc"),
+      accent: "border-t-destructive",
+    },
+    {
+      icon: Sparkles,
+      title: t("landing.featLogoTitle"),
+      description: t("landing.featLogoDesc"),
+      accent: "border-t-primary",
+    },
+    {
+      icon: CheckCircle2,
+      title: t("landing.featVisualTitle"),
+      description: t("landing.featVisualDesc"),
+      accent: "border-t-success",
+    },
+  ];
+
+  const socialProofs = [
+    { value: "1,000+", label: t("landing.proofBrands") },
+    { value: "5,000+", label: t("landing.proofContent") },
+    { value: "100+", label: t("landing.proofUsers") },
+    { value: "4.9/5", label: t("landing.proofRating") },
+  ];
+
+  const steps = [
+    {
+      num: "1",
+      title: t("landing.step1Title"),
+      description: t("landing.step1Desc"),
+    },
+    {
+      num: "2",
+      title: t("landing.step2Title"),
+      description: t("landing.step2Desc"),
+    },
+    {
+      num: "3",
+      title: t("landing.step3Title"),
+      description: t("landing.step3Desc"),
+    },
+  ];
+
   return (
     <div className="flex flex-col flex-1">
       {/* Header */}
@@ -96,20 +95,22 @@ export default function Home() {
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
               <Palette size={18} className="text-white" />
             </div>
-            <span className="text-lg font-bold text-foreground">BrandAI</span>
+            <span className="text-lg font-bold text-foreground">UMKMkitAssistant</span>
           </div>
           <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <LanguageSwitcher />
             <Link
               href="/login"
               className="text-sm font-medium text-foreground hover:text-primary transition-colors duration-150 px-3 py-2"
             >
-              Masuk
+              {t("landing.signIn")}
             </Link>
             <Link
               href="/register"
               className="text-sm font-medium bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary-dark transition-all duration-150 active:scale-[0.98]"
             >
-              Daftar Gratis
+              {t("landing.signUpFree")}
             </Link>
           </div>
         </div>
@@ -129,22 +130,21 @@ export default function Home() {
               <AnimateIn animation="fade-in-up">
                 <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-sm font-medium px-4 py-1.5 rounded-full mb-6">
                   <Sparkles size={14} />
-                  Didukung AI GPT-4 & DALL-E
+                  {t("landing.poweredBy")}
                 </div>
               </AnimateIn>
 
               <AnimateIn animation="fade-in-up" delay={100}>
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground tracking-tight leading-tight text-balance">
-                  Bangun Brand Anda
+                  {t("landing.heroTitle1")}
                   <br />
-                  <span className="gradient-text">dengan Kekuatan AI</span>
+                  <span className="gradient-text">{t("landing.heroTitle2")}</span>
                 </h1>
               </AnimateIn>
 
               <AnimateIn animation="fade-in-up" delay={200}>
                 <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                  Platform AI all-in-one untuk membuat brand kit, generate konten
-                  media sosial, jadwalkan posting, dan analisis performa.
+                  {t("landing.heroDesc")}
                 </p>
               </AnimateIn>
 
@@ -154,19 +154,17 @@ export default function Home() {
                     href="/register"
                     className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-gradient-primary text-white font-semibold text-lg hover:brightness-110 transition-all duration-200 shadow-lg shadow-primary/25 active:scale-[0.98]"
                   >
-                    Mulai Gratis
+                    {t("landing.ctaStart")}
                     <ArrowRight size={18} />
                   </Link>
                   <Link
                     href="#features"
                     className="inline-flex items-center justify-center px-8 py-4 rounded-xl border border-border text-foreground font-semibold text-lg hover:bg-secondary transition-all duration-200 active:scale-[0.98]"
                   >
-                    Lihat Fitur
+                    {t("landing.ctaFeatures")}
                   </Link>
                 </div>
-                <p className="mt-4 text-sm text-muted-foreground">
-                  Gratis. Tanpa kartu kredit.
-                </p>
+                <AwogawogButton />
               </AnimateIn>
             </div>
 
@@ -270,11 +268,10 @@ export default function Home() {
         <div className="max-w-6xl mx-auto relative">
           <AnimateIn className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">
-              Semua yang Anda butuhkan
+              {t("landing.featuresTitle")}
             </h2>
             <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Dari membuat brand kit hingga menganalisis performa konten, semua
-              bisa dilakukan dalam satu platform.
+              {t("landing.featuresDesc")}
             </p>
           </AnimateIn>
 
@@ -310,10 +307,10 @@ export default function Home() {
         <div className="max-w-4xl mx-auto relative">
           <AnimateIn className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">
-              Cara Kerja
+              {t("landing.howTitle")}
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Tiga langkah mudah untuk mulai membangun brand Anda
+              {t("landing.howDesc")}
             </p>
           </AnimateIn>
 
@@ -350,17 +347,17 @@ export default function Home() {
         <div className="max-w-3xl mx-auto text-center relative">
           <AnimateIn animation="scale-in">
             <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight text-balance">
-              Siap Membangun Brand Anda?
+              {t("landing.ctaTitle")}
             </h2>
             <p className="mt-4 text-lg text-white/80 leading-relaxed">
-              Bergabung sekarang dan mulai buat konten yang luar biasa dengan AI
+              {t("landing.ctaDesc")}
             </p>
             <div className="mt-8">
               <Link
                 href="/register"
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-white text-primary font-semibold text-lg hover:bg-white/90 transition-all duration-200 active:scale-[0.98] shadow-lg"
               >
-                Mulai Sekarang - Gratis
+                {t("landing.ctaButton")}
                 <ArrowRight size={18} />
               </Link>
             </div>
@@ -378,25 +375,24 @@ export default function Home() {
                   <Palette size={18} className="text-white" />
                 </div>
                 <span className="text-lg font-bold text-foreground">
-                  BrandAI
+                  UMKMkitAssistant
                 </span>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed max-w-sm">
-                Platform AI untuk membangun brand dan membuat konten media sosial
-                yang menarik. Dibuat dengan Next.js & OpenAI.
+                {t("landing.footerDesc")}
               </p>
             </div>
             <div>
-              <h4 className="font-semibold text-foreground mb-3">Fitur</h4>
+              <h4 className="font-semibold text-foreground mb-3">{t("landing.footerFeatures")}</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>Brand Kit Generator</li>
-                <li>Content Generator</li>
-                <li>Kalender Konten</li>
-                <li>Analitik & Insight</li>
+                <li>{t("landing.featBrandKitTitle")}</li>
+                <li>{t("landing.featContentTitle")}</li>
+                <li>{t("landing.featCalendarTitle")}</li>
+                <li>{t("landing.featAnalyticsTitle")}</li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold text-foreground mb-3">Teknologi</h4>
+              <h4 className="font-semibold text-foreground mb-3">{t("landing.footerTech")}</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li className="flex items-center gap-2">
                   <Zap size={14} /> GPT-4 & DALL-E
@@ -412,7 +408,7 @@ export default function Home() {
           </div>
           <div className="border-t border-border pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
-              &copy; 2026 BrandAI. All rights reserved.
+              &copy; 2026 UMKMkitAssistant. All rights reserved.
             </p>
             <p className="text-sm text-muted-foreground">
               AI Branding & Content Assistant

@@ -4,21 +4,24 @@ import { usePathname } from "next/navigation";
 import { ChevronRight, Home } from "lucide-react";
 import Link from "next/link";
 import { useBreadcrumb } from "./breadcrumb-provider";
-
-const labelMap: Record<string, string> = {
-  dashboard: "Dashboard",
-  branding: "Branding",
-  content: "Konten",
-  calendar: "Kalender",
-  analytics: "Analitik",
-  new: "Baru",
-  generate: "Generate",
-  edit: "Edit",
-};
+import { useTranslations } from "next-intl";
 
 export function Breadcrumb() {
   const pathname = usePathname();
   const { overrides } = useBreadcrumb();
+  const t = useTranslations();
+
+  const labelMap: Record<string, string> = {
+    dashboard: t("nav.dashboard"),
+    branding: t("nav.branding"),
+    content: t("nav.content"),
+    calendar: t("nav.calendar"),
+    analytics: t("nav.analytics"),
+    new: t("nav.new"),
+    generate: t("nav.generate"),
+    edit: t("common.edit"),
+  };
+
   const segments = pathname.split("/").filter(Boolean);
 
   if (segments.length === 0) return null;

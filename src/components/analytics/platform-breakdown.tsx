@@ -3,12 +3,19 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { PLATFORMS } from "@/lib/constants";
 import type { Analytics, Platform } from "@/types";
+import { useTranslations } from "next-intl";
+import { useLocaleStore } from "@/i18n/locale";
 
 interface PlatformBreakdownProps {
   analytics: Analytics[];
 }
 
 export function PlatformBreakdown({ analytics }: PlatformBreakdownProps) {
+  const t = useTranslations();
+  const { locale } = useLocaleStore();
+
+  const numLocale = locale === "en" ? "en-US" : "id-ID";
+
   const getThemeColors = () => {
     if (typeof window === "undefined") {
       return {
@@ -48,9 +55,9 @@ export function PlatformBreakdown({ analytics }: PlatformBreakdownProps) {
   if (platformData.length === 0) {
     return (
       <div className="p-5 rounded-xl border border-border bg-card">
-        <h3 className="text-lg font-semibold text-foreground mb-4">Per Platform</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-4">{t("analytics.chartPlatform")}</h3>
         <div className="h-64 flex items-center justify-center text-muted-foreground">
-          Belum ada data platform
+          {t("analytics.chartNoPlatform")}
         </div>
       </div>
     );
@@ -58,7 +65,7 @@ export function PlatformBreakdown({ analytics }: PlatformBreakdownProps) {
 
   return (
     <div className="p-5 rounded-xl border border-border bg-card">
-      <h3 className="text-lg font-semibold text-foreground mb-4">Per Platform</h3>
+      <h3 className="text-lg font-semibold text-foreground mb-4">{t("analytics.chartPlatform")}</h3>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
@@ -85,7 +92,7 @@ export function PlatformBreakdown({ analytics }: PlatformBreakdownProps) {
                 borderRadius: "8px",
               }}
               formatter={(value, name) => [
-                Number(value).toLocaleString("id-ID"),
+                Number(value).toLocaleString(numLocale),
                 PLATFORMS.find((p) => p.value === name)?.label || String(name),
               ]}
             />

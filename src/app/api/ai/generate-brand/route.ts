@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { getOpenAIClient } from "@/lib/openai/client";
 import { generateBrandKitPrompt } from "@/lib/openai/prompts/branding";
 import { brandKitSchema } from "@/lib/openai/schemas/branding";
 import { createClient } from "@/lib/supabase/server";
+import type { Locale } from "@/lib/openai/prompts/index";
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,8 +17,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const cookieStore = await cookies();
+    const locale = (cookieStore.get("locale")?.value as Locale) || "id";
+
     const body = await request.json();
-    const prompt = generateBrandKitPrompt(body);
+    const prompt = generateBrandKitPrompt(body, locale);
 
     const openai = getOpenAIClient();
     const completion = await openai.chat.completions.create({

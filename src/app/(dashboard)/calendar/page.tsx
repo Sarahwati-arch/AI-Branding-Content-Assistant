@@ -6,6 +6,8 @@ import { ScheduleModal } from "@/components/calendar/schedule-modal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useLocaleStore } from "@/i18n/locale";
 import type { CalendarEvent } from "@/types";
 
 export default function CalendarPage() {
@@ -15,6 +17,10 @@ export default function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [scheduling, setScheduling] = useState(false);
+  const t = useTranslations();
+  const { locale } = useLocaleStore();
+
+  const dateLocale = locale === "en" ? "en-US" : "id-ID";
 
   useEffect(() => {
     fetchEvents();
@@ -69,7 +75,7 @@ export default function CalendarPage() {
   };
 
   const handleDeleteEvent = async (id: string) => {
-    if (!confirm("Yakin ingin menghapus event ini?")) return;
+    if (!confirm(t("calendar.confirmDeleteEvent"))) return;
     try {
       await fetch(`/api/calendar/${id}`, { method: "DELETE" });
       setSelectedEvent(null);
@@ -83,12 +89,12 @@ export default function CalendarPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">Kalender Konten</h1>
-          <p className="text-muted-foreground mt-1">Jadwalkan dan kelola posting konten Anda</p>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">{t("calendar.title")}</h1>
+          <p className="text-muted-foreground mt-1">{t("calendar.subtitle")}</p>
         </div>
         <Button onClick={() => { setSelectedDate(new Date()); setModalOpen(true); }}>
           <Plus size={18} className="mr-2" />
-          Jadwalkan Konten
+          {t("calendar.scheduleContent")}
         </Button>
       </div>
 
@@ -107,7 +113,7 @@ export default function CalendarPage() {
 
         {/* Sidebar - Event Details */}
         <div className="space-y-4">
-          <h3 className="font-semibold text-foreground">Detail Event</h3>
+          <h3 className="font-semibold text-foreground">{t("calendar.eventDetail")}</h3>
           {selectedEvent ? (
             <div className="p-4 rounded-xl border border-border bg-card space-y-3">
               <h4 className="font-medium text-foreground">{selectedEvent.title}</h4>
@@ -116,7 +122,7 @@ export default function CalendarPage() {
               )}
               <Badge>{selectedEvent.platform}</Badge>
               <p className="text-xs text-muted-foreground">
-                {new Date(selectedEvent.scheduled_at).toLocaleDateString("id-ID", {
+                {new Date(selectedEvent.scheduled_at).toLocaleDateString(dateLocale, {
                   weekday: "long",
                   day: "numeric",
                   month: "long",
@@ -132,19 +138,19 @@ export default function CalendarPage() {
                 onClick={() => handleDeleteEvent(selectedEvent.id)}
               >
                 <Trash2 size={14} className="mr-1" />
-                Hapus
+                {t("common.delete")}
               </Button>
             </div>
           ) : (
             <div className="p-4 rounded-xl border border-border bg-card text-center">
               <p className="text-sm text-muted-foreground">
-                Klik tanggal untuk menambah jadwal, atau klik event untuk melihat detail
+                {t("calendar.noSelection")}
               </p>
             </div>
           )}
 
           {/* Upcoming Events */}
-          <h3 className="font-semibold text-foreground mt-6">Jadwal Mendatang</h3>
+          <h3 className="font-semibold text-foreground mt-6">{t("calendar.upcoming")}</h3>
           <div className="space-y-2">
             {events
               .filter((e) => new Date(e.scheduled_at) >= new Date())
@@ -157,7 +163,7 @@ export default function CalendarPage() {
                 >
                   <p className="text-sm font-medium text-foreground">{event.title}</p>
                   <p className="text-xs text-muted-foreground">
-                    {new Date(event.scheduled_at).toLocaleDateString("id-ID", {
+                    {new Date(event.scheduled_at).toLocaleDateString(dateLocale, {
                       day: "numeric",
                       month: "short",
                       hour: "2-digit",
@@ -168,7 +174,7 @@ export default function CalendarPage() {
               ))}
             {events.filter((e) => new Date(e.scheduled_at) >= new Date()).length === 0 && (
               <p className="text-sm text-muted-foreground text-center py-4">
-                Belum ada jadwal
+                {t("calendar.noUpcoming")}
               </p>
             )}
           </div>

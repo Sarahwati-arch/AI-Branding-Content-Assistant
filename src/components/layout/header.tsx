@@ -3,6 +3,7 @@
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { UserMenu } from "@/components/layout/user-menu";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { LanguageSwitcher } from "@/components/ui/language-switcher";
 
 export function Header() {
   return (
@@ -10,6 +11,7 @@ export function Header() {
       <Breadcrumb />
       <div className="flex items-center gap-2">
         <ThemeToggle />
+        <LanguageSwitcher />
         <UserMenu />
       </div>
     </header>

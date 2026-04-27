@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { User, LogOut, ChevronDown } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export function UserMenu() {
   const [open, setOpen] = useState(false);
@@ -11,6 +12,7 @@ export function UserMenu() {
   const [userEmail, setUserEmail] = useState<string>("");
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const t = useTranslations();
 
   useEffect(() => {
     const getUser = async () => {
@@ -77,7 +79,7 @@ export function UserMenu() {
               className="flex items-center gap-2 w-full px-3 py-2 text-sm text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors duration-150"
             >
               <LogOut size={16} />
-              Keluar
+              {t("common.logout")}
             </button>
           </div>
         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   format,
   startOfMonth,
@@ -15,10 +15,13 @@ import {
   isToday,
 } from "date-fns";
 import { id as localeId } from "date-fns/locale/id";
+import { enUS as localeEn } from "date-fns/locale/en-US";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PLATFORMS } from "@/lib/constants";
+import { useTranslations } from "next-intl";
+import { useLocaleStore } from "@/i18n/locale";
 import type { CalendarEvent } from "@/types";
 
 interface ContentCalendarProps {
@@ -29,6 +32,10 @@ interface ContentCalendarProps {
 
 export function ContentCalendar({ events, onEventClick, onDateClick }: ContentCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const t = useTranslations();
+  const { locale } = useLocaleStore();
+
+  const dateFnsLocale = locale === "en" ? localeEn : localeId;
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(monthStart);
@@ -46,14 +53,22 @@ export function ContentCalendar({ events, onEventClick, onDateClick }: ContentCa
     return events.filter((event) => isSameDay(new Date(event.scheduled_at), date));
   };
 
-  const weekDays = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
+  const weekDays = [
+    t("calendar.weekMon"),
+    t("calendar.weekTue"),
+    t("calendar.weekWed"),
+    t("calendar.weekThu"),
+    t("calendar.weekFri"),
+    t("calendar.weekSat"),
+    t("calendar.weekSun"),
+  ];
 
   return (
     <div>
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold text-foreground">
-          {format(currentMonth, "MMMM yyyy", { locale: localeId })}
+          {format(currentMonth, "MMMM yyyy", { locale: dateFnsLocale })}
         </h2>
         <div className="flex gap-2">
           <Button
@@ -68,7 +83,7 @@ export function ContentCalendar({ events, onEventClick, onDateClick }: ContentCa
             size="sm"
             onClick={() => setCurrentMonth(new Date())}
           >
-            Hari Ini
+            {t("calendar.today")}
           </Button>
           <Button
             variant="outline"
@@ -134,7 +149,7 @@ export function ContentCalendar({ events, onEventClick, onDateClick }: ContentCa
                   );
                 })}
                 {dayEvents.length > 3 && (
-                  <p className="text-xs text-muted-foreground">+{dayEvents.length - 3} lagi</p>
+                  <p className="text-xs text-muted-foreground">+{dayEvents.length - 3} {t("common.more")}</p>
                 )}
               </div>
             </div>

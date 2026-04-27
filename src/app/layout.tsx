@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { cookies } from "next/headers";
+import { I18nProvider } from "@/i18n/client";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,32 +14,40 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "AI Branding Assistant - Buat Brand & Konten dengan AI",
-  description:
-    "Platform AI untuk membuat brand kit, generate konten media sosial, dan mengelola strategi branding Anda.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const cookieStore = await cookies();
+  const locale = cookieStore.get("locale")?.value || "id";
 
-export default function RootLayout({
+  return {
+    title:
+      locale === "en"
+        ? "AI Branding Assistant - Build Brand & Content with AI"
+        : "AI Branding Assistant - Buat Brand & Konten dengan AI",
+    description:
+      locale === "en"
+        ? "AI platform to create brand kits, generate social media content, and manage your branding strategy."
+        : "Platform AI untuk membuat brand kit, generate konten media sosial, dan mengelola strategi branding Anda.",
+  };
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const locale = cookieStore.get("locale")?.value || "id";
+
   return (
     <html
-      lang="id"
+      lang={locale}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <head>
-        <script
-          async
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})()`,
-          }}
-        />
-      </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <head />
+      <body className="min-h-full flex flex-col">
+        <I18nProvider>{children}</I18nProvider>
+      </body>
     </html>
   );
 }

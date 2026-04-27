@@ -10,54 +10,58 @@ interface DialogProps {
 }
 
 export function Dialog({ open, onClose, children, title }: DialogProps) {
-  const overlayRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   const [animateIn, setAnimateIn] = useState(false);
 
   useEffect(() => {
+    if (!open) return;
+
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
-    if (open) {
-      setVisible(true);
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => setAnimateIn(true));
-      });
-      document.addEventListener("keydown", handleEsc);
-      document.body.style.overflow = "hidden";
-    } else {
-      setAnimateIn(false);
-      const timer = setTimeout(() => setVisible(false), 200);
-      document.body.style.overflow = "";
-      return () => clearTimeout(timer);
-    }
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (contentRef.current && !contentRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+
+    setVisible(true);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setAnimateIn(true));
+    });
+
+    document.addEventListener("keydown", handleEsc);
+    document.addEventListener("mousedown", handleClickOutside);
+    document.body.style.overflow = "hidden";
+
     return () => {
       document.removeEventListener("keydown", handleEsc);
+      document.removeEventListener("mousedown", handleClickOutside);
       document.body.style.overflow = "";
     };
   }, [open, onClose]);
 
+  useEffect(() => {
+    if (!open && visible) {
+      setAnimateIn(false);
+      const timer = setTimeout(() => setVisible(false), 200);
+      return () => clearTimeout(timer);
+    }
+  }, [open, visible]);
+
   if (!visible) return null;
 
   return (
-    <div
-      ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      onClick={(e) => {
-        if (e.target === overlayRef.current) onClose();
-      }}
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
-        className={`fixed inset-0 bg-overlay transition-opacity duration-200 ${
-          animateIn ? "opacity-100" : "opacity-0"
-        }`}
-      />
-      <div
-        className={`relative bg-card rounded-xl border border-border shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto transition-all duration-200 ${
+        className={`relative bg-card rounded-xl border border-border shadow-xl max-w-sm w-full mx-4 max-h-[90vh] overflow-y-auto transition-all duration-200 ${
           animateIn
             ? "opacity-100 scale-100"
             : "opacity-0 scale-[0.95]"
         }`}
+        ref={contentRef}
       >
         {title && (
           <div className="p-6 pb-0">

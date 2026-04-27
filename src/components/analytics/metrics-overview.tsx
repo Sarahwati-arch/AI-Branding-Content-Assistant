@@ -1,12 +1,19 @@
 "use client";
 
 import type { Analytics } from "@/types";
+import { useTranslations } from "next-intl";
+import { useLocaleStore } from "@/i18n/locale";
 
 interface MetricsOverviewProps {
   analytics: Analytics[];
 }
 
 export function MetricsOverview({ analytics }: MetricsOverviewProps) {
+  const t = useTranslations();
+  const { locale } = useLocaleStore();
+
+  const numLocale = locale === "en" ? "en-US" : "id-ID";
+
   const totalImpressions = analytics.reduce((sum, a) => sum + a.impressions, 0);
   const totalReach = analytics.reduce((sum, a) => sum + a.reach, 0);
   const totalLikes = analytics.reduce((sum, a) => sum + a.likes, 0);
@@ -18,12 +25,12 @@ export function MetricsOverview({ analytics }: MetricsOverviewProps) {
       : 0;
 
   const metrics = [
-    { label: "Total Impressions", value: totalImpressions.toLocaleString("id-ID") },
-    { label: "Total Reach", value: totalReach.toLocaleString("id-ID") },
-    { label: "Avg. Engagement Rate", value: `${avgEngagement.toFixed(1)}%` },
-    { label: "Total Likes", value: totalLikes.toLocaleString("id-ID") },
-    { label: "Total Komentar", value: totalComments.toLocaleString("id-ID") },
-    { label: "Total Share", value: totalShares.toLocaleString("id-ID") },
+    { label: t("analytics.impressions"), value: totalImpressions.toLocaleString(numLocale) },
+    { label: t("analytics.reach"), value: totalReach.toLocaleString(numLocale) },
+    { label: t("analytics.engagementRate"), value: `${avgEngagement.toFixed(1)}%` },
+    { label: t("analytics.totalLikes"), value: totalLikes.toLocaleString(numLocale) },
+    { label: t("analytics.totalComments"), value: totalComments.toLocaleString(numLocale) },
+    { label: t("analytics.totalShares"), value: totalShares.toLocaleString(numLocale) },
   ];
 
   return (

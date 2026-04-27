@@ -6,6 +6,8 @@ import type { Content, Platform } from "@/types";
 import { PLATFORMS } from "@/lib/constants";
 import { Edit2, Trash2, Calendar } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { useLocaleStore } from "@/i18n/locale";
 
 interface ContentCardProps {
   content: Content;
@@ -14,6 +16,10 @@ interface ContentCardProps {
 
 export function ContentCard({ content, onDelete }: ContentCardProps) {
   const platform = PLATFORMS.find((p) => p.value === content.platform);
+  const t = useTranslations();
+  const { locale } = useLocaleStore();
+
+  const dateLocale = locale === "en" ? "en-US" : "id-ID";
 
   const statusVariants: Record<string, "default" | "primary" | "secondary" | "success"> = {
     draft: "default",
@@ -23,10 +29,10 @@ export function ContentCard({ content, onDelete }: ContentCardProps) {
   };
 
   const statusLabels: Record<string, string> = {
-    draft: "Draft",
-    generated: "Generated",
-    scheduled: "Terjadwal",
-    published: "Dipublikasi",
+    draft: t("common.draft"),
+    generated: t("common.generated"),
+    scheduled: t("common.scheduled"),
+    published: t("common.published"),
   };
 
   return (
@@ -82,7 +88,7 @@ export function ContentCard({ content, onDelete }: ContentCardProps) {
           ))}
           {content.hashtags.length > 5 && (
             <span className="text-xs text-muted-foreground">
-              +{content.hashtags.length - 5} lagi
+              +{content.hashtags.length - 5} {t("common.more")}
             </span>
           )}
         </div>
@@ -91,7 +97,7 @@ export function ContentCard({ content, onDelete }: ContentCardProps) {
       {content.scheduled_at && (
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
           <Calendar size={12} />
-          {new Date(content.scheduled_at).toLocaleDateString("id-ID", {
+          {new Date(content.scheduled_at).toLocaleDateString(dateLocale, {
             day: "numeric",
             month: "short",
             year: "numeric",

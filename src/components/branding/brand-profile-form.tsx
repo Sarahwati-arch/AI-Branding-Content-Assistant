@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { PRODUCT_CATEGORIES, VISUAL_STYLES } from "@/lib/constants";
+import { getProductCategories, getVisualStyles, PRODUCT_CATEGORY_KEYS, VISUAL_STYLE_KEYS } from "@/lib/constants";
+import { useTranslations } from "next-intl";
 
 interface BrandProfileFormProps {
   onSubmit: (data: {
@@ -26,6 +27,10 @@ export function BrandProfileForm({ onSubmit, loading }: BrandProfileFormProps) {
   const [targetAudience, setTargetAudience] = useState("");
   const [uniqueValue, setUniqueValue] = useState("");
   const [visualStyle, setVisualStyle] = useState("");
+  const t = useTranslations();
+
+  const categories = getProductCategories(t);
+  const visualStyles = getVisualStyles(t);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,8 +44,8 @@ export function BrandProfileForm({ onSubmit, loading }: BrandProfileFormProps) {
     <form onSubmit={handleSubmit} className="space-y-5">
       <Input
         id="brandName"
-        label="Nama Brand"
-        placeholder="Contoh: Kopi Nusantara"
+        label={t("brandForm.brandName")}
+        placeholder={t("brandForm.brandNamePlaceholder")}
         value={brandName}
         onChange={(e) => setBrandName(e.target.value)}
         required
@@ -48,18 +53,18 @@ export function BrandProfileForm({ onSubmit, loading }: BrandProfileFormProps) {
 
       <Select
         id="industry"
-        label="Industri"
-        placeholder="Pilih industri"
+        label={t("brandForm.industry")}
+        placeholder={t("brandForm.industryPlaceholder")}
         value={industry}
         onChange={(e) => setIndustry(e.target.value)}
-        options={PRODUCT_CATEGORIES.map((cat) => ({ value: cat, label: cat }))}
+        options={categories}
         required
       />
 
       <Textarea
         id="description"
-        label="Deskripsi Brand"
-        placeholder="Ceritakan tentang brand Anda..."
+        label={t("brandForm.description")}
+        placeholder={t("brandForm.descriptionPlaceholder")}
         rows={3}
         value={description}
         onChange={(e) => setDescription(e.target.value)}
@@ -68,8 +73,8 @@ export function BrandProfileForm({ onSubmit, loading }: BrandProfileFormProps) {
 
       <Textarea
         id="targetAudience"
-        label="Target Audiens"
-        placeholder="Contoh: Wanita 25-35 tahun, urban, tertarik gaya hidup sehat"
+        label={t("brandForm.targetAudience")}
+        placeholder={t("brandForm.targetAudiencePlaceholder")}
         rows={2}
         value={targetAudience}
         onChange={(e) => setTargetAudience(e.target.value)}
@@ -78,8 +83,8 @@ export function BrandProfileForm({ onSubmit, loading }: BrandProfileFormProps) {
 
       <Textarea
         id="uniqueValue"
-        label="Nilai Unik / USP"
-        placeholder="Apa yang membuat brand Anda berbeda?"
+        label={t("brandForm.uniqueValue")}
+        placeholder={t("brandForm.uniqueValuePlaceholder")}
         rows={2}
         value={uniqueValue}
         onChange={(e) => setUniqueValue(e.target.value)}
@@ -88,16 +93,16 @@ export function BrandProfileForm({ onSubmit, loading }: BrandProfileFormProps) {
 
       <Select
         id="visualStyle"
-        label="Gaya Visual"
-        placeholder="Pilih gaya visual"
+        label={t("brandForm.visualStyle")}
+        placeholder={t("brandForm.visualStylePlaceholder")}
         value={visualStyle}
         onChange={(e) => setVisualStyle(e.target.value)}
-        options={VISUAL_STYLES.map((style) => ({ value: style, label: style }))}
+        options={visualStyles.map((style) => ({ value: style, label: style }))}
         required
       />
 
       <Button type="submit" disabled={!isValid || loading} className="w-full">
-        {loading ? "Generating Brand Kit..." : "Generate Brand Kit dengan AI"}
+        {loading ? t("brandForm.generating") : t("brandForm.generate")}
       </Button>
     </form>
   );

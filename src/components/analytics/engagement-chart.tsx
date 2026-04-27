@@ -11,12 +11,19 @@ import {
   Legend,
 } from "recharts";
 import type { Analytics } from "@/types";
+import { useTranslations } from "next-intl";
+import { useLocaleStore } from "@/i18n/locale";
 
 interface EngagementChartProps {
   analytics: Analytics[];
 }
 
 export function EngagementChart({ analytics }: EngagementChartProps) {
+  const t = useTranslations();
+  const { locale } = useLocaleStore();
+
+  const dateLocale = locale === "en" ? "en-US" : "id-ID";
+
   // Get theme-aware colors
   const getThemeColors = () => {
     if (typeof window === "undefined") {
@@ -47,7 +54,7 @@ export function EngagementChart({ analytics }: EngagementChartProps) {
   // Group by date
   const chartData = analytics.reduce(
     (acc, a) => {
-      const date = new Date(a.recorded_at).toLocaleDateString("id-ID", {
+      const date = new Date(a.recorded_at).toLocaleDateString(dateLocale, {
         day: "numeric",
         month: "short",
       });
@@ -67,9 +74,9 @@ export function EngagementChart({ analytics }: EngagementChartProps) {
   if (chartData.length === 0) {
     return (
       <div className="p-5 rounded-xl border border-border bg-card">
-        <h3 className="text-lg font-semibold text-foreground mb-4">Engagement</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-4">{t("analytics.chartEngagement")}</h3>
         <div className="h-64 flex items-center justify-center text-muted-foreground">
-          Belum ada data engagement
+          {t("analytics.chartNoEngagement")}
         </div>
       </div>
     );
@@ -77,7 +84,7 @@ export function EngagementChart({ analytics }: EngagementChartProps) {
 
   return (
     <div className="p-5 rounded-xl border border-border bg-card">
-      <h3 className="text-lg font-semibold text-foreground mb-4">Engagement</h3>
+      <h3 className="text-lg font-semibold text-foreground mb-4">{t("analytics.chartEngagement")}</h3>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData}>
@@ -93,8 +100,8 @@ export function EngagementChart({ analytics }: EngagementChartProps) {
             />
             <Legend />
             <Bar dataKey="likes" fill={colors.primary} name="Likes" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="comments" fill={colors.accent} name="Komentar" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="shares" fill={colors.success} name="Share" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="comments" fill={colors.accent} name={t("analytics.comments")} radius={[4, 4, 0, 0]} />
+            <Bar dataKey="shares" fill={colors.success} name={t("analytics.shares")} radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

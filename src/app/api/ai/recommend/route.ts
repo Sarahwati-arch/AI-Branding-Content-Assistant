@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { getOpenAIClient } from "@/lib/openai/client";
 import { generateStrategyPrompt } from "@/lib/openai/prompts/strategy";
 import { createClient } from "@/lib/supabase/server";
+import type { Locale } from "@/lib/openai/prompts/index";
 
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const cookieStore = await cookies();
+    const locale = (cookieStore.get("locale")?.value as Locale) || "id";
 
     // Get user analytics summary
     const { data: analytics } = await supabase
@@ -22,9 +27,13 @@ export async function POST(request: NextRequest) {
         data: [
           {
             type: "strategy",
-            title: "Mulai Posting Konten",
-            description: "Anda belum memiliki data performa. Mulai dengan membuat dan mempublikasikan konten.",
-            action: "Buat brand profile dan generate konten pertama Anda",
+            title: locale === "en" ? "Start Posting Content" : "Mulai Posting Konten",
+            description: locale === "en"
+              ? "You don't have performance data yet. Start by creating and publishing content."
+              : "Anda belum memiliki data performa. Mulai dengan membuat dan mempublikasikan konten.",
+            action: locale === "en"
+              ? "Create a brand profile and generate your first content"
+              : "Buat brand profile dan generate konten pertama Anda",
             priority: "high",
           },
         ],
@@ -45,7 +54,7 @@ Best performing platform: ${analytics.reduce(
     ).platform || "N/A"}
 `;
 
-    const prompt = generateStrategyPrompt(summary);
+    const prompt = generateStrategyPrompt(summary, locale);
     const openai = getOpenAIClient();
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",

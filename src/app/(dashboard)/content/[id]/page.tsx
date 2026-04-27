@@ -5,12 +5,12 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Save, Trash2 } from "lucide-react";
-import { PLATFORMS, CONTENT_TYPES } from "@/lib/constants";
+import { PLATFORMS } from "@/lib/constants";
+import { useTranslations } from "next-intl";
 import type { Content } from "@/types";
 
 export default function ContentDetailPage() {
@@ -22,6 +22,7 @@ export default function ContentDetailPage() {
   const [title, setTitle] = useState("");
   const [caption, setCaption] = useState("");
   const [hashtags, setHashtags] = useState("");
+  const t = useTranslations();
 
   useEffect(() => {
     fetchContent();
@@ -71,7 +72,7 @@ export default function ContentDetailPage() {
   };
 
   const handleDelete = async () => {
-    if (!confirm("Yakin ingin menghapus konten ini?")) return;
+    if (!confirm(t("content.confirmDelete"))) return;
     try {
       await fetch(`/api/content/${params.id}`, { method: "DELETE" });
       router.push("/content");
@@ -93,9 +94,9 @@ export default function ContentDetailPage() {
   if (!content) {
     return (
       <div className="text-center py-16">
-        <h2 className="text-lg font-semibold">Konten tidak ditemukan</h2>
+        <h2 className="text-lg font-semibold">{t("content.notFound")}</h2>
         <Link href="/content" className="text-primary mt-2 inline-block">
-          Kembali ke daftar konten
+          {t("content.backToList")}
         </Link>
       </div>
     );
@@ -110,12 +111,12 @@ export default function ContentDetailPage() {
         className="text-sm text-muted-foreground hover:text-foreground transition inline-flex items-center gap-1 mb-4"
       >
         <ArrowLeft size={14} />
-        Kembali
+        {t("common.back")}
       </Link>
 
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Edit Konten</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t("content.editContent")}</h1>
           <div className="flex items-center gap-2 mt-1">
             <Badge>{content.type}</Badge>
             <span
@@ -131,21 +132,21 @@ export default function ContentDetailPage() {
         </div>
         <Button variant="destructive" size="sm" onClick={handleDelete}>
           <Trash2 size={14} className="mr-1" />
-          Hapus
+          {t("common.delete")}
         </Button>
       </div>
 
       <form onSubmit={handleSave} className="space-y-5 p-6 rounded-xl border border-border bg-card">
         <Input
           id="title"
-          label="Judul"
+          label={t("content.titleLabel")}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
         />
         <Textarea
           id="caption"
-          label="Caption"
+          label={t("content.caption")}
           rows={6}
           value={caption}
           onChange={(e) => setCaption(e.target.value)}
@@ -153,14 +154,14 @@ export default function ContentDetailPage() {
         />
         <Input
           id="hashtags"
-          label="Hashtag (pisahkan dengan koma)"
+          label={t("content.hashtag")}
           value={hashtags}
           onChange={(e) => setHashtags(e.target.value)}
         />
         {content.visual_url && (
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
-              Visual
+              {t("content.visual")}
             </label>
             <img
               src={content.visual_url}
@@ -172,7 +173,7 @@ export default function ContentDetailPage() {
         <div className="flex justify-end">
           <Button type="submit" disabled={saving}>
             <Save size={16} className="mr-2" />
-            {saving ? "Menyimpan..." : "Simpan Perubahan"}
+            {saving ? t("common.saving") : t("content.saveChanges")}
           </Button>
         </div>
       </form>

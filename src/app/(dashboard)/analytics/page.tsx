@@ -11,6 +11,7 @@ import { Select } from "@/components/ui/select";
 import { Dialog } from "@/components/ui/dialog";
 import { Plus, BarChart3 } from "lucide-react";
 import { PLATFORMS } from "@/lib/constants";
+import { useTranslations } from "next-intl";
 import type { Analytics, Content, AIRecommendation } from "@/types";
 
 export default function AnalyticsPage() {
@@ -21,6 +22,7 @@ export default function AnalyticsPage() {
   const [loadingRecommendations, setLoadingRecommendations] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [adding, setAdding] = useState(false);
+  const t = useTranslations();
 
   // Form state
   const [selectedContent, setSelectedContent] = useState("");
@@ -125,12 +127,12 @@ export default function AnalyticsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">Analitik</h1>
-          <p className="text-muted-foreground mt-1">Pantau performa konten Anda</p>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">{t("analytics.title")}</h1>
+          <p className="text-muted-foreground mt-1">{t("analytics.subtitle")}</p>
         </div>
         <Button onClick={() => setAddModalOpen(true)}>
           <Plus size={18} className="mr-2" />
-          Tambah Data
+          {t("analytics.addData")}
         </Button>
       </div>
 
@@ -145,13 +147,13 @@ export default function AnalyticsPage() {
           <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4 animate-float">
             <BarChart3 size={32} className="text-primary" />
           </div>
-          <h2 className="text-lg font-semibold text-foreground">Belum ada data analitik</h2>
+          <h2 className="text-lg font-semibold text-foreground">{t("analytics.noDataTitle")}</h2>
           <p className="text-muted-foreground mt-2 mb-6 max-w-md mx-auto">
-            Tambahkan data performa konten untuk melihat insight
+            {t("analytics.noDataDesc")}
           </p>
           <Button onClick={() => setAddModalOpen(true)}>
             <Plus size={18} className="mr-2" />
-            Tambah Data Pertama
+            {t("analytics.addFirstData")}
           </Button>
         </div>
       ) : (
@@ -172,11 +174,11 @@ export default function AnalyticsPage() {
       )}
 
       {/* Add Analytics Modal */}
-      <Dialog open={addModalOpen} onClose={() => setAddModalOpen(false)} title="Tambah Data Analitik">
+      <Dialog open={addModalOpen} onClose={() => setAddModalOpen(false)} title={t("analytics.addTitle")}>
         <form onSubmit={handleAddAnalytics} className="space-y-4">
           <Select
             id="analyticContent"
-            label="Konten"
+            label={t("analytics.content")}
             value={selectedContent}
             onChange={(e) => setSelectedContent(e.target.value)}
             options={contents.map((c) => ({ value: c.id, label: c.title }))}
@@ -184,7 +186,7 @@ export default function AnalyticsPage() {
           />
           <Select
             id="analyticPlatform"
-            label="Platform"
+            label={t("scheduleModal.platform")}
             value={selectedPlatform}
             onChange={(e) => setSelectedPlatform(e.target.value)}
             options={PLATFORMS.map((p) => ({ value: p.value, label: p.label }))}
@@ -193,17 +195,17 @@ export default function AnalyticsPage() {
             <Input id="impressions" label="Impressions" type="number" value={impressions} onChange={(e) => setImpressions(e.target.value)} />
             <Input id="reach" label="Reach" type="number" value={reach} onChange={(e) => setReach(e.target.value)} />
             <Input id="likes" label="Likes" type="number" value={likes} onChange={(e) => setLikes(e.target.value)} />
-            <Input id="comments" label="Komentar" type="number" value={comments} onChange={(e) => setComments(e.target.value)} />
-            <Input id="shares" label="Share" type="number" value={shares} onChange={(e) => setShares(e.target.value)} />
-            <Input id="saves" label="Save" type="number" value={saves} onChange={(e) => setSaves(e.target.value)} />
-            <Input id="clicks" label="Klik" type="number" value={clicks} onChange={(e) => setClicks(e.target.value)} />
+            <Input id="comments" label={t("analytics.comments")} type="number" value={comments} onChange={(e) => setComments(e.target.value)} />
+            <Input id="shares" label={t("analytics.shares")} type="number" value={shares} onChange={(e) => setShares(e.target.value)} />
+            <Input id="saves" label={t("analytics.saves")} type="number" value={saves} onChange={(e) => setSaves(e.target.value)} />
+            <Input id="clicks" label={t("analytics.clicks")} type="number" value={clicks} onChange={(e) => setClicks(e.target.value)} />
           </div>
           <div className="flex gap-3 justify-end">
             <Button type="button" variant="outline" onClick={() => setAddModalOpen(false)}>
-              Batal
+              {t("common.cancel")}
             </Button>
             <Button type="submit" disabled={adding}>
-              {adding ? "Menyimpan..." : "Simpan"}
+              {adding ? t("common.saving") : t("common.save")}
             </Button>
           </div>
         </form>

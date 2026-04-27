@@ -1,14 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { getOpenAIClient } from "@/lib/openai/client";
 import { generateContentPrompt } from "@/lib/openai/prompts/content";
 import { contentOutputSchema } from "@/lib/openai/schemas/content";
 import { createClient } from "@/lib/supabase/server";
+import type { Locale } from "@/lib/openai/prompts/index";
 
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const cookieStore = await cookies();
+    const locale = (cookieStore.get("locale")?.value as Locale) || "id";
 
     const body = await request.json();
 
@@ -32,7 +37,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const prompt = generateContentPrompt(body, brandContext);
+    const prompt = generateContentPrompt(body, brandContext, locale);
 
     const openai = getOpenAIClient();
     const completion = await openai.chat.completions.create({

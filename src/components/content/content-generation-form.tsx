@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { CONTENT_TYPES, PLATFORMS } from "@/lib/constants";
+import { getContentTypes, PLATFORMS } from "@/lib/constants";
+import { useTranslations } from "next-intl";
 import type { ContentType, Platform, BrandProfile } from "@/types";
 
 interface ContentGenerationFormProps {
@@ -26,6 +27,9 @@ export function ContentGenerationForm({ onSubmit, loading }: ContentGenerationFo
   const [platform, setPlatform] = useState<Platform>("instagram");
   const [topic, setTopic] = useState("");
   const [additionalContext, setAdditionalContext] = useState("");
+  const t = useTranslations();
+
+  const contentTypes = getContentTypes(t);
 
   useEffect(() => {
     fetchBrands();
@@ -55,25 +59,25 @@ export function ContentGenerationForm({ onSubmit, loading }: ContentGenerationFo
     <form onSubmit={handleSubmit} className="space-y-5">
       <Select
         id="brand"
-        label="Brand"
+        label={t("contentForm.brand")}
         value={brandId}
         onChange={(e) => setBrandId(e.target.value)}
         options={brands.map((b) => ({ value: b.id, label: b.brand_name }))}
-        placeholder="Pilih brand"
+        placeholder={t("contentForm.brandPlaceholder")}
         required
       />
 
       <div className="grid grid-cols-2 gap-4">
         <Select
           id="contentType"
-          label="Tipe Konten"
+          label={t("contentForm.contentType")}
           value={contentType}
           onChange={(e) => setContentType(e.target.value as ContentType)}
-          options={CONTENT_TYPES.map((t) => ({ value: t.value, label: t.label }))}
+          options={contentTypes}
         />
         <Select
           id="platform"
-          label="Platform"
+          label={t("contentForm.platform")}
           value={platform}
           onChange={(e) => setPlatform(e.target.value as Platform)}
           options={PLATFORMS.map((p) => ({ value: p.value, label: p.label }))}
@@ -82,8 +86,8 @@ export function ContentGenerationForm({ onSubmit, loading }: ContentGenerationFo
 
       <Input
         id="topic"
-        label="Topik / Tema"
-        placeholder="Contoh: Tips menjaga kulit sehat di musim hujan"
+        label={t("contentForm.topic")}
+        placeholder={t("contentForm.topicPlaceholder")}
         value={topic}
         onChange={(e) => setTopic(e.target.value)}
         required
@@ -91,15 +95,15 @@ export function ContentGenerationForm({ onSubmit, loading }: ContentGenerationFo
 
       <Textarea
         id="additionalContext"
-        label="Konteks Tambahan (opsional)"
-        placeholder="Informasi tambahan untuk AI..."
+        label={t("contentForm.additionalContext")}
+        placeholder={t("contentForm.additionalContextPlaceholder")}
         rows={3}
         value={additionalContext}
         onChange={(e) => setAdditionalContext(e.target.value)}
       />
 
       <Button type="submit" disabled={!isValid || loading} className="w-full">
-        {loading ? "Generating Konten..." : "Generate Konten dengan AI"}
+        {loading ? t("contentForm.generating") : t("contentForm.generate")}
       </Button>
     </form>
   );

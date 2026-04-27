@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, Lightbulb, TrendingUp, Clock, Target, Share2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { AIRecommendation } from "@/types";
 
 interface AIRecommendationsProps {
@@ -25,26 +25,28 @@ const priorityVariant: Record<string, "destructive" | "primary" | "secondary"> =
   low: "secondary",
 };
 
-const priorityLabel: Record<string, string> = {
-  high: "Prioritas Tinggi",
-  medium: "Prioritas Sedang",
-  low: "Prioritas Rendah",
-};
-
 export function AIRecommendations({
   recommendations,
   loading,
   onRequestRecommendations,
 }: AIRecommendationsProps) {
+  const t = useTranslations();
+
+  const priorityLabel: Record<string, string> = {
+    high: t("aiRec.priorityHigh"),
+    medium: t("aiRec.priorityMedium"),
+    low: t("aiRec.priorityLow"),
+  };
+
   return (
     <div className="p-6 rounded-xl border border-border bg-card">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Sparkles size={20} className="text-primary" />
-          <h3 className="text-lg font-semibold text-foreground">Rekomendasi AI</h3>
+          <h3 className="text-lg font-semibold text-foreground">{t("aiRec.title")}</h3>
         </div>
         <Button onClick={onRequestRecommendations} disabled={loading} variant="outline" size="sm">
-          {loading ? "Menganalisis..." : "Minta Rekomendasi"}
+          {loading ? t("aiRec.analyzing") : t("aiRec.request")}
         </Button>
       </div>
 
@@ -52,7 +54,7 @@ export function AIRecommendations({
         <div className="text-center py-8">
           <Target size={32} className="text-muted-foreground mx-auto mb-3" />
           <p className="text-sm text-muted-foreground">
-            Klik tombol di atas untuk mendapatkan rekomendasi strategi dari AI
+            {t("aiRec.emptyHint")}
           </p>
         </div>
       ) : (
@@ -71,7 +73,7 @@ export function AIRecommendations({
               <p className="text-sm text-muted-foreground">{rec.description}</p>
               <div className="bg-background rounded-lg p-3">
                 <p className="text-sm text-foreground">
-                  <span className="font-medium">Langkah:</span> {rec.action}
+                  <span className="font-medium">{t("aiRec.step")}</span> {rec.action}
                 </p>
               </div>
             </div>

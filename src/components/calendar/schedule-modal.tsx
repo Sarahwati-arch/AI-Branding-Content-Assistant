@@ -7,9 +7,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { PLATFORMS, CONTENT_TYPES } from "@/lib/constants";
+import { PLATFORMS, getContentTypes } from "@/lib/constants";
 import { format } from "date-fns";
 import { Search, FileText, PenLine } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { Content } from "@/types";
 
 type ScheduleMode = "select" | "manual";
@@ -40,6 +41,7 @@ export function ScheduleModal({
   const [fetchingContents, setFetchingContents] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedContent, setSelectedContent] = useState<Content | null>(null);
+  const t = useTranslations();
 
   // Manual form fields
   const [title, setTitle] = useState("");
@@ -135,21 +137,21 @@ export function ScheduleModal({
     PLATFORMS.find((p) => p.value === value)?.color || "#64748b";
 
   const getContentTypeLabel = (value: string) =>
-    CONTENT_TYPES.find((t) => t.value === value)?.label || value;
+    getContentTypes(t).find((ct) => ct.value === value)?.label || value;
 
   const getStatusBadge = (status: string) => {
     const map: Record<string, { variant: "info" | "success" | "warning" | "default"; label: string }> = {
-      draft: { variant: "default", label: "Draft" },
-      generated: { variant: "info", label: "Generated" },
-      scheduled: { variant: "warning", label: "Scheduled" },
-      published: { variant: "success", label: "Published" },
+      draft: { variant: "default", label: t("common.draft") },
+      generated: { variant: "info", label: t("common.generated") },
+      scheduled: { variant: "warning", label: t("common.scheduled") },
+      published: { variant: "success", label: t("common.published") },
     };
     const s = map[status] || { variant: "default" as const, label: status };
     return <Badge variant={s.variant}>{s.label}</Badge>;
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} title="Jadwalkan Konten">
+    <Dialog open={open} onClose={handleClose} title={t("scheduleModal.title")}>
       {/* Mode Toggle */}
       <div className="flex gap-2 mb-4 border-b border-border pb-3">
         <button
@@ -162,7 +164,7 @@ export function ScheduleModal({
           onClick={() => setMode("select")}
         >
           <FileText size={16} />
-          Pilih Konten
+          {t("scheduleModal.selectContent")}
         </button>
         <button
           type="button"
@@ -174,7 +176,7 @@ export function ScheduleModal({
           onClick={() => setMode("manual")}
         >
           <PenLine size={16} />
-          Tambah Manual
+          {t("scheduleModal.addManual")}
         </button>
       </div>
 
@@ -182,7 +184,7 @@ export function ScheduleModal({
       <div className="mb-4">
         <Input
           id="scheduleDate"
-          label="Tanggal & Waktu"
+          label={t("scheduleModal.dateTime")}
           type="datetime-local"
           value={scheduledAt}
           onChange={(e) => setScheduledAt(e.target.value)}
@@ -198,7 +200,7 @@ export function ScheduleModal({
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Cari konten..."
+              placeholder={t("scheduleModal.searchPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
@@ -208,21 +210,21 @@ export function ScheduleModal({
           {/* Content list */}
           {fetchingContents ? (
             <div className="text-center py-8 text-sm text-muted-foreground">
-              Memuat konten...
+              {t("scheduleModal.loadingContent")}
             </div>
           ) : filteredContents.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-sm text-muted-foreground">
                 {contents.length === 0
-                  ? "Belum ada konten yang tersedia. Buat konten terlebih dahulu di menu Konten, atau tambah manual."
-                  : "Tidak ada konten yang cocok dengan pencarian."}
+                  ? t("scheduleModal.noContent")
+                  : t("scheduleModal.noSearchResult")}
               </p>
               <button
                 type="button"
                 className="mt-2 text-sm text-primary hover:underline"
                 onClick={() => setMode("manual")}
               >
-                Tambah manual
+                {t("scheduleModal.addManualLink")}
               </button>
             </div>
           ) : (
@@ -275,10 +277,10 @@ export function ScheduleModal({
           {/* Submit for select mode */}
           <div className="flex gap-3 justify-end pt-2">
             <Button type="button" variant="outline" onClick={handleClose}>
-              Batal
+              {t("common.cancel")}
             </Button>
             <Button type="button" disabled={!selectedContent || loading} onClick={handleSelectSubmit}>
-              {loading ? "Menyimpan..." : "Jadwalkan"}
+              {loading ? t("common.saving") : t("scheduleModal.schedule")}
             </Button>
           </div>
         </div>
@@ -287,33 +289,33 @@ export function ScheduleModal({
         <form onSubmit={handleManualSubmit} className="space-y-4">
           <Input
             id="scheduleTitle"
-            label="Judul"
+            label={t("scheduleModal.titleField")}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Judul konten"
+            placeholder={t("scheduleModal.titlePlaceholder")}
             required
           />
           <Textarea
             id="scheduleDesc"
-            label="Deskripsi (opsional)"
+            label={t("scheduleModal.description")}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
-            placeholder="Deskripsi atau catatan..."
+            placeholder={t("scheduleModal.descriptionPlaceholder")}
           />
           <Select
             id="schedulePlatform"
-            label="Platform"
+            label={t("scheduleModal.platform")}
             value={platform}
             onChange={(e) => setPlatform(e.target.value)}
             options={PLATFORMS.map((p) => ({ value: p.value, label: p.label }))}
           />
           <div className="flex gap-3 justify-end">
             <Button type="button" variant="outline" onClick={handleClose}>
-              Batal
+              {t("common.cancel")}
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? "Menyimpan..." : "Jadwalkan"}
+              {loading ? t("common.saving") : t("scheduleModal.schedule")}
             </Button>
           </div>
         </form>

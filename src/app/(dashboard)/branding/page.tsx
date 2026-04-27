@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AnimateIn } from "@/components/ui/animate-in";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslations } from "next-intl";
 import type { BrandProfile, BrandGuidelines } from "@/types";
 
 type BrandWithGuidelines = BrandProfile & { brand_guidelines: BrandGuidelines[] };
 
 export default function BrandingPage() {
+  const t = useTranslations();
   const [brands, setBrands] = useState<BrandWithGuidelines[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -38,8 +40,8 @@ export default function BrandingPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-foreground tracking-tight">Branding</h1>
-            <p className="text-muted-foreground mt-1">Kelola brand profile Anda</p>
+            <h1 className="text-2xl font-bold text-foreground tracking-tight">{t("branding.title")}</h1>
+            <p className="text-muted-foreground mt-1">{t("branding.subtitle")}</p>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -55,13 +57,13 @@ export default function BrandingPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">Branding</h1>
-          <p className="text-muted-foreground mt-1">Kelola brand profile Anda</p>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">{t("branding.title")}</h1>
+          <p className="text-muted-foreground mt-1">{t("branding.subtitle")}</p>
         </div>
         <Link href="/branding/new">
           <Button>
             <Plus size={18} className="mr-2" />
-            Buat Brand Baru
+            {t("branding.createNew")}
           </Button>
         </Link>
       </div>
@@ -72,15 +74,15 @@ export default function BrandingPage() {
             <Palette size={32} className="text-primary" />
           </div>
           <h2 className="text-lg font-semibold text-foreground">
-            Belum ada brand
+            {t("branding.noBrandTitle")}
           </h2>
           <p className="text-muted-foreground mt-2 mb-6 max-w-md mx-auto">
-            Buat brand profile pertama Anda dan biarkan AI generate brand kit
+            {t("branding.noBrandDesc")}
           </p>
           <Link href="/branding/new">
             <Button>
               <Plus size={18} className="mr-2" />
-              Buat Brand Pertama
+              {t("branding.createFirst")}
             </Button>
           </Link>
         </div>
@@ -137,7 +139,7 @@ export default function BrandingPage() {
                         backgroundColor: brand.brand_guidelines[0].accent_color,
                       }}
                     />
-                    <Badge variant="success" dot>Brand Kit</Badge>
+                    <Badge variant="success" dot>{t("branding.brandKit")}</Badge>
                   </div>
                 )}
               </Link>
