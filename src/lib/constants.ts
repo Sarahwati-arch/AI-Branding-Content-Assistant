@@ -1,22 +1,30 @@
 import type { ContentType, Platform } from "@/types";
 
-export const PRODUCT_CATEGORIES = [
-  "Makanan & Minuman",
-  "Fashion & Pakaian",
-  "Teknologi & Elektronik",
-  "Kecantikan & Perawatan",
-  "Kesehatan & Fitness",
-  "Pendidikan & Pelatihan",
-  "Properti & Real Estate",
-  "Otomotif",
-  "Pariwisata & Travel",
-  "Finance & Bisnis",
-  "Hiburan & Media",
-  "Kuliner & Restoran",
-  "E-commerce & Retail",
-  "Jasa & Layanan",
-  "Lainnya",
+// Category keys for i18n lookup
+export const PRODUCT_CATEGORY_KEYS = [
+  "food",
+  "fashion",
+  "tech",
+  "beauty",
+  "health",
+  "education",
+  "property",
+  "automotive",
+  "travel",
+  "finance",
+  "entertainment",
+  "culinary",
+  "ecommerce",
+  "services",
+  "other",
 ] as const;
+
+export function getProductCategories(t: (key: string) => string) {
+  return PRODUCT_CATEGORY_KEYS.map((key) => ({
+    value: t(`constants.${key}`),
+    label: t(`constants.${key}`),
+  }));
+}
 
 export const PLATFORMS: { value: Platform; label: string; color: string }[] = [
   { value: "instagram", label: "Instagram", color: "#E4405F" },
@@ -27,27 +35,42 @@ export const PLATFORMS: { value: Platform; label: string; color: string }[] = [
   { value: "youtube", label: "YouTube", color: "#FF0000" },
 ];
 
-export const CONTENT_TYPES: { value: ContentType; label: string }[] = [
-  { value: "post", label: "Post" },
-  { value: "story", label: "Story" },
-  { value: "reel", label: "Reel/Video Pendek" },
-  { value: "carousel", label: "Carousel" },
-  { value: "video", label: "Video" },
-  { value: "article", label: "Artikel" },
+// Content type keys for i18n lookup (some labels are self-translating)
+export const CONTENT_TYPE_KEYS: { value: ContentType; translationKey: string }[] = [
+  { value: "post", translationKey: "post" },
+  { value: "story", translationKey: "story" },
+  { value: "reel", translationKey: "constants.reel" },
+  { value: "carousel", translationKey: "carousel" },
+  { value: "video", translationKey: "video" },
+  { value: "article", translationKey: "constants.article" },
 ];
 
-export const VISUAL_STYLES = [
-  "Modern & Minimalis",
-  "Bold & Berani",
-  "Elegant & Mewah",
-  "Playful & Fun",
-  "Professional & Korporat",
-  "Vintage & Retro",
-  "Natural & Organik",
-  "Futuristik & Tech",
-  "Colorful & Ceria",
-  "Clean & Simpel",
+export function getContentTypes(t: (key: string) => string) {
+  return CONTENT_TYPE_KEYS.map((ct) => ({
+    value: ct.value,
+    label: ct.translationKey.includes(".")
+      ? t(ct.translationKey)
+      : ct.translationKey.charAt(0).toUpperCase() + ct.translationKey.slice(1),
+  }));
+}
+
+// Visual style keys for i18n lookup
+export const VISUAL_STYLE_KEYS = [
+  "styleModern",
+  "styleBold",
+  "styleElegant",
+  "stylePlayful",
+  "styleProfessional",
+  "styleVintage",
+  "styleNatural",
+  "styleFuturistic",
+  "styleColorful",
+  "styleClean",
 ] as const;
+
+export function getVisualStyles(t: (key: string) => string) {
+  return VISUAL_STYLE_KEYS.map((key) => t(`constants.${key}`));
+}
 
 export const PLATFORM_IMAGE_SIZES: Record<Platform, { width: number; height: number; label: string }> = {
   instagram: { width: 1080, height: 1080, label: "1:1 (Feed Post)" },
@@ -59,9 +82,9 @@ export const PLATFORM_IMAGE_SIZES: Record<Platform, { width: number; height: num
 };
 
 export const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard", icon: "LayoutDashboard" },
-  { href: "/branding", label: "Branding", icon: "Palette" },
-  { href: "/content", label: "Konten", icon: "FileText" },
-  { href: "/calendar", label: "Kalender", icon: "CalendarDays" },
-  { href: "/analytics", label: "Analitik", icon: "BarChart3" },
+  { href: "/dashboard", translationKey: "nav.dashboard", icon: "LayoutDashboard" },
+  { href: "/branding", translationKey: "nav.branding", icon: "Palette" },
+  { href: "/content", translationKey: "nav.content", icon: "FileText" },
+  { href: "/calendar", translationKey: "nav.calendar", icon: "CalendarDays" },
+  { href: "/analytics", translationKey: "nav.analytics", icon: "BarChart3" },
 ] as const;
