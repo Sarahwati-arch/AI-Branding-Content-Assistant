@@ -50,6 +50,9 @@ export default function RegisterPage() {
 
   return (
     <div className="bg-card rounded-2xl shadow-xl border border-border p-8">
+      <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
+        ← {t("common.backToHome")}
+      </Link>
       <div className="text-center mb-8">
         <h1 className="text-2xl font-bold text-foreground tracking-tight">{t("auth.registerTitle")}</h1>
         <p className="text-muted-foreground mt-2">
